@@ -19,7 +19,16 @@ const plugins = [{
 }];
 
 module.exports = callback => {
-  const server = new Hapi.Server();
+  const server = new Hapi.Server({
+    connections: {
+      routes: {
+        response: {
+          failAction: process.env.RESPONSE_FAIL_ACTION || 'log',
+          status: require('hapi-error-schemas').statuses()
+        }
+      }
+    }
+  });
 
   server.connection({port: 8080});
 
