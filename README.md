@@ -1,2 +1,2 @@
-# orderable-search-indexer
-Indexes product data for Orderable search
+# orderable-search
+A wrapper around Big Wednesday search for Orderable
