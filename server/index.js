@@ -14,6 +14,8 @@ const plugins = [{
       version: process.env.npm_package_version
     }
   }
+}, {
+  register: require('./indexing_jobs')
 }];
 
 module.exports = callback => {
