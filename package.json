@@ -23,6 +23,7 @@
   "homepage": "https://github.com/BigWednesdayIO/orderable-search#readme",
   "dependencies": {
     "hapi": "^11.1.2",
+    "hapi-error-schemas": "^1.0.0",
     "hapi-swaggered": "^2.4.1",
     "hapi-version-route": "^1.1.0",
     "joi": "^7.0.1"
