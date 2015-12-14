@@ -57,7 +57,7 @@ describe('Linked Product Indexer', () => {
   ['add', 'update'].forEach(fn => {
     describe(fn, () => {
       beforeEach(done => {
-        indexer[fn]({id: 'supplier_product1', supplier_id: 's1', product_id: 'p1'});
+        indexer[fn]({id: 'supplier_product1', supplier_id: 's1', product_id: 'p1', price: 15, was_price: 20.99});
 
         // allow async operation to complete
         setTimeout(done, 100);
@@ -69,6 +69,14 @@ describe('Linked Product Indexer', () => {
 
       it('sends the supplier id in the index request', () => {
         expect(putBody).to.have.property('supplier_id', 's1');
+      });
+
+      it('sends the supplier price in the index request', () => {
+        expect(putBody).to.have.property('price', 15);
+      });
+
+      it('sends the supplier was price in the index request', () => {
+        expect(putBody).to.have.property('was_price', 20.99);
       });
 
       it('sends the product attributes in the index request', () => {
