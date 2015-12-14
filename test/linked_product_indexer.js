@@ -6,6 +6,9 @@ const sinon = require('sinon');
 
 const indexer = require('../lib/linked_product_indexer');
 
+const searchApi = 'http://localhost:1111';
+const productApi = 'http://localhost:2222';
+
 describe('Linked Product Indexer', () => {
   let putToSearchApi;
   let deleteFromSearchAPI;
@@ -14,32 +17,32 @@ describe('Linked Product Indexer', () => {
   const product = {name: 'a product', category: 'abc', brand: 'own brand'};
 
   beforeEach(() => {
-    putToSearchApi = nock('http://localhost:1111')
+    putToSearchApi = nock(searchApi)
       .put('/indexes/orderable-products/supplier_product1')
       .reply(200, (uri, body) => putBody = JSON.parse(body));
 
-    deleteFromSearchAPI = nock('http://localhost:1111')
+    deleteFromSearchAPI = nock(searchApi)
       .delete('/indexes/orderable-products/supplier_product1')
       .reply(204, null);
 
-    nock('http://localhost:1111')
+    nock(searchApi)
       .put('/indexes/orderable-products/supplier_product2')
       .reply(200, {})
       .put('/indexes/orderable-products/error')
-      .replyWithError('A non-HTTP search API error')
+      .replyWithError('A non-HTTP error')
       .put('/indexes/orderable-products/500')
       .reply(500, {message: 'Internal Server Error'})
       .delete('/indexes/orderable-products/error')
-      .replyWithError('A non-HTTP search API error')
+      .replyWithError('A non-HTTP error')
       .delete('/indexes/orderable-products/500')
       .reply(500, {message: 'Internal Server Error'});
 
-    nock('http://localhost:2222')
+    nock(productApi)
       .get('/products/p1')
       .reply(200, product)
       .persist()
       .get('/products/error')
-      .replyWithError('A non-HTTP product API error')
+      .replyWithError('A non-HTTP error')
       .get('/products/500')
       .reply(500, {message: 'Internal Server Error'});
 
@@ -80,8 +83,7 @@ describe('Linked Product Indexer', () => {
         indexer[fn]({id: 'supplier_product2', supplier_id: 's1', product_id: 'error'});
 
         setTimeout(() => {
-          expect(consoleErrorSpy.lastCall.args[0]).to.be.an('error');
-          expect(consoleErrorSpy.lastCall.args[0].message).to.equal('A non-HTTP product API error');
+          expect(consoleErrorSpy.lastCall.args[0]).to.equal(`GET ${productApi}/products/error failed with: A non-HTTP error`);
           done();
         }, 500);
       });
@@ -90,8 +92,7 @@ describe('Linked Product Indexer', () => {
         indexer[fn]({id: 'supplier_product2', supplier_id: 's1', product_id: '500'});
 
         setTimeout(() => {
-          expect(consoleErrorSpy.lastCall.args[0]).to.be.an('error');
-          expect(consoleErrorSpy.lastCall.args[0].message).to.equal('Product API HTTP error 500 - {"message":"Internal Server Error"}');
+          expect(consoleErrorSpy.lastCall.args[0]).to.equal(`GET ${productApi}/products/500 failed with: HTTP error 500 - {"message":"Internal Server Error"}`);
           done();
         }, 500);
       });
@@ -100,8 +101,7 @@ describe('Linked Product Indexer', () => {
         indexer[fn]({id: 'error', supplier_id: 's1', product_id: 'p1'});
 
         setTimeout(() => {
-          expect(consoleErrorSpy.lastCall.args[0]).to.be.an('error');
-          expect(consoleErrorSpy.lastCall.args[0].message).to.equal('A non-HTTP search API error');
+          expect(consoleErrorSpy.lastCall.args[0]).to.equal(`PUT ${searchApi}/indexes/orderable-products/error failed with: A non-HTTP error`);
           done();
         }, 500);
       });
@@ -110,8 +110,7 @@ describe('Linked Product Indexer', () => {
         indexer[fn]({id: '500', supplier_id: 's1', product_id: 'p1'});
 
         setTimeout(() => {
-          expect(consoleErrorSpy.lastCall.args[0]).to.be.an('error');
-          expect(consoleErrorSpy.lastCall.args[0].message).to.equal('Search API HTTP error 500 - {"message":"Internal Server Error"}');
+          expect(consoleErrorSpy.lastCall.args[0]).to.equal(`PUT ${searchApi}/indexes/orderable-products/500 failed with: HTTP error 500 - {"message":"Internal Server Error"}`);
           done();
         }, 500);
       });
@@ -119,23 +118,20 @@ describe('Linked Product Indexer', () => {
   });
 
   describe('remove', () => {
-    beforeEach(() => {
-      indexer.remove('supplier_product1');
-    });
-
     it('removes the supplier\'s product from the index', done => {
-      setImmediate(() => {
+      indexer.remove('supplier_product1');
+
+      setTimeout(() => {
         expect(deleteFromSearchAPI.isDone()).to.equal(true, 'Failed to make DELETE request to Search API');
         done();
-      });
+      }, 500);
     });
 
     it('sends search api errors to console.error', done => {
       indexer.remove('error');
 
       setTimeout(() => {
-        expect(consoleErrorSpy.lastCall.args[0]).to.be.an('error');
-        expect(consoleErrorSpy.lastCall.args[0].message).to.equal('A non-HTTP search API error');
+        expect(consoleErrorSpy.lastCall.args[0]).to.equal(`DELETE ${searchApi}/indexes/orderable-products/error failed with: A non-HTTP error`);
         done();
       }, 500);
     });
@@ -144,8 +140,7 @@ describe('Linked Product Indexer', () => {
       indexer.remove('500');
 
       setTimeout(() => {
-        expect(consoleErrorSpy.lastCall.args[0]).to.be.an('error');
-        expect(consoleErrorSpy.lastCall.args[0].message).to.equal('Search API HTTP error 500 - {"message":"Internal Server Error"}');
+        expect(consoleErrorSpy.lastCall.args[0]).to.equal(`DELETE ${searchApi}/indexes/orderable-products/500 failed with: HTTP error 500 - {"message":"Internal Server Error"}`);
         done();
       }, 500);
     });
