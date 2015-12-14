@@ -52,4 +52,5 @@ module.exports = function (grunt) {
   grunt.registerTask('test', ['env:test', 'mochaTest:test']);
   grunt.registerTask('spec', ['env:test', 'mochaTest:spec']);
   grunt.registerTask('default', ['lint', 'test', 'spec']);
+  grunt.registerTask('ci', ['default', 'retire']);
 };
