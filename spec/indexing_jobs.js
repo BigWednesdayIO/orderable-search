@@ -4,7 +4,7 @@ const expect = require('chai').expect;
 const specRequest = require('./spec_request');
 
 describe('/indexing_jobs', () => {
-  const payload = {trigger_type: 'product', action: 'add', data: {id: '1'}};
+  const payload = {trigger_type: 'product', action: 'update', data: {id: '1'}};
 
   describe('post', () => {
     let postResponse;
@@ -39,22 +39,29 @@ describe('/indexing_jobs', () => {
             expect(response.result).to.have.property('message', 'child "action" fails because ["action" is required]');
           }));
 
-      it('rejects request when action is not "add", "remove" or "update"', () =>
-        specRequest({url: '/indexing_jobs', method: 'POST', payload: {trigger_type: 'product', action: 'x'}})
+      it('rejects request when action is not "add", "remove" or "update" for linked_product', () =>
+        specRequest({url: '/indexing_jobs', method: 'POST', payload: {trigger_type: 'linked_product', action: 'x'}})
           .then(response => {
             expect(response.statusCode).to.equal(400);
             expect(response.result).to.have.property('message', 'child "action" fails because ["action" must be one of [add, remove, update]]');
           }));
 
-      it('rejects request when data is missing', () =>
+      it('rejects request when action is not "update" for product', () =>
         specRequest({url: '/indexing_jobs', method: 'POST', payload: {trigger_type: 'product', action: 'add'}})
+          .then(response => {
+            expect(response.statusCode).to.equal(400);
+            expect(response.result).to.have.property('message', 'child "action" fails because ["action" must be one of [update]]');
+          }));
+
+      it('rejects request when data is missing', () =>
+        specRequest({url: '/indexing_jobs', method: 'POST', payload: {trigger_type: 'product', action: 'update'}})
           .then(response => {
             expect(response.statusCode).to.equal(400);
             expect(response.result).to.have.property('message', 'child "data" fails because ["data" is required]');
           }));
 
       it('rejects request when data is missing id', () =>
-        specRequest({url: '/indexing_jobs', method: 'POST', payload: {trigger_type: 'product', action: 'add', data: {}}})
+        specRequest({url: '/indexing_jobs', method: 'POST', payload: {trigger_type: 'product', action: 'update', data: {}}})
           .then(response => {
             expect(response.statusCode).to.equal(400);
             expect(response.result).to.have.property('message', 'child "data" fails because [child "id" fails because ["id" is required]]');
