@@ -5,9 +5,7 @@ const nock = require('nock');
 const sinon = require('sinon');
 
 const indexer = require('../lib/product_indexer');
-
-const searchApi = 'http://localhost:1111';
-const suppliersApi = 'http://localhost:3333';
+const uris = require('../lib/uris');
 
 const supplierLinkedProducts = [
   {id: 's1', _metadata: {linked_product_id: 's1p'}},
@@ -28,7 +26,7 @@ describe('Product indexer', () => {
     let consoleErrorSpy;
 
     beforeEach(done => {
-      nock(suppliersApi)
+      nock(uris.suppliers)
         .get('/suppliers?supplies_product=p1')
         .reply(200, supplierLinkedProducts)
         .get('/suppliers?supplies_product=supplier_api_error')
@@ -44,7 +42,7 @@ describe('Product indexer', () => {
         .get('/suppliers?supplies_product=search_api_batch_500')
         .reply(200, [{id: 's1', _metadata: {linked_product_id: 'search_api_batch_500'}}]);
 
-      nock(searchApi)
+      nock(uris.search)
         .get('/indexes/orderable-products?id[]=s1p&id[]=s2p')
         .reply(200, existingIndexedProducts)
         .get('/indexes/orderable-products?id[]=search_api_get_error')
@@ -56,7 +54,7 @@ describe('Product indexer', () => {
         .get('/indexes/orderable-products?id[]=search_api_batch_500')
         .reply(200, [{objectID: 'search_api_batch_500'}]);
 
-      putToSearchApi = nock(searchApi)
+      putToSearchApi = nock(uris.search)
         .post('/indexes/orderable-products/batch')
         .reply(200, (uri, body) => indexBatch = JSON.parse(body));
 
@@ -107,7 +105,7 @@ describe('Product indexer', () => {
 
       setTimeout(() => {
         expect(consoleErrorSpy.lastCall.args[0]).to.equal(
-          `GET ${suppliersApi}/suppliers?supplies_product=supplier_api_error failed with: A non-HTTP error`);
+          `GET ${uris.suppliers}/suppliers?supplies_product=supplier_api_error failed with: A non-HTTP error`);
 
         done();
       }, 500);
@@ -118,7 +116,7 @@ describe('Product indexer', () => {
 
       setTimeout(() => {
         expect(consoleErrorSpy.lastCall.args[0]).to.equal(
-          `GET ${suppliersApi}/suppliers?supplies_product=supplier_api_500 failed with: HTTP error 500 - {"message":"Internal Server Error"}`);
+          `GET ${uris.suppliers}/suppliers?supplies_product=supplier_api_500 failed with: HTTP error 500 - {"message":"Internal Server Error"}`);
 
         done();
       }, 500);
@@ -129,7 +127,7 @@ describe('Product indexer', () => {
 
       setTimeout(() => {
         expect(consoleErrorSpy.lastCall.args[0]).to.equal(
-          `GET ${searchApi}/indexes/orderable-products?id[]=search_api_get_error failed with: A non-HTTP error`);
+          `GET ${uris.search}/indexes/orderable-products?id[]=search_api_get_error failed with: A non-HTTP error`);
 
         done();
       }, 500);
@@ -140,14 +138,14 @@ describe('Product indexer', () => {
 
       setTimeout(() => {
         expect(consoleErrorSpy.lastCall.args[0]).to.equal(
-          `GET ${searchApi}/indexes/orderable-products?id[]=search_api_get_500 failed with: HTTP error 500 - {"message":"Internal Server Error"}`);
+          `GET ${uris.search}/indexes/orderable-products?id[]=search_api_get_500 failed with: HTTP error 500 - {"message":"Internal Server Error"}`);
 
         done();
       }, 500);
     });
 
     it('sends search api batch errors to console.error', done => {
-      nock(searchApi)
+      nock(uris.search)
         .post('/indexes/orderable-products/batch')
         .replyWithError('A non-HTTP error');
 
@@ -155,14 +153,14 @@ describe('Product indexer', () => {
 
       setTimeout(() => {
         expect(consoleErrorSpy.lastCall.args[0]).to.equal(
-          `POST ${searchApi}/indexes/orderable-products/batch failed with: A non-HTTP error`);
+          `POST ${uris.search}/indexes/orderable-products/batch failed with: A non-HTTP error`);
 
         done();
       }, 500);
     });
 
     it('sends search api batch non-200 responses to console.error', done => {
-      nock(searchApi)
+      nock(uris.search)
         .post('/indexes/orderable-products/batch')
         .reply(500, {message: 'Internal Server Error'});
 
@@ -170,7 +168,7 @@ describe('Product indexer', () => {
 
       setTimeout(() => {
         expect(consoleErrorSpy.lastCall.args[0]).to.equal(
-          `POST ${searchApi}/indexes/orderable-products/batch failed with: HTTP error 500 - {"message":"Internal Server Error"}`);
+          `POST ${uris.search}/indexes/orderable-products/batch failed with: HTTP error 500 - {"message":"Internal Server Error"}`);
 
         done();
       }, 500);

@@ -5,9 +5,7 @@ const nock = require('nock');
 const sinon = require('sinon');
 
 const indexer = require('../lib/linked_product_indexer');
-
-const searchApi = 'http://localhost:1111';
-const productApi = 'http://localhost:2222';
+const uris = require('../lib/uris');
 
 describe('Linked Product Indexer', () => {
   let putToSearchApi;
@@ -17,15 +15,15 @@ describe('Linked Product Indexer', () => {
   const product = {name: 'a product', category: 'abc', brand: 'own brand'};
 
   beforeEach(() => {
-    putToSearchApi = nock(searchApi)
+    putToSearchApi = nock(uris.search)
       .put('/indexes/orderable-products/supplier_product1')
       .reply(200, (uri, body) => putBody = JSON.parse(body));
 
-    deleteFromSearchAPI = nock(searchApi)
+    deleteFromSearchAPI = nock(uris.search)
       .delete('/indexes/orderable-products/supplier_product1')
       .reply(204, null);
 
-    nock(searchApi)
+    nock(uris.search)
       .put('/indexes/orderable-products/supplier_product2')
       .reply(200, {})
       .put('/indexes/orderable-products/error')
@@ -37,7 +35,7 @@ describe('Linked Product Indexer', () => {
       .delete('/indexes/orderable-products/500')
       .reply(500, {message: 'Internal Server Error'});
 
-    nock(productApi)
+    nock(uris.products)
       .get('/products/p1')
       .reply(200, product)
       .persist()
@@ -91,7 +89,7 @@ describe('Linked Product Indexer', () => {
         indexer[fn]({id: 'supplier_product2', supplier_id: 's1', product_id: 'error'});
 
         setTimeout(() => {
-          expect(consoleErrorSpy.lastCall.args[0]).to.equal(`GET ${productApi}/products/error failed with: A non-HTTP error`);
+          expect(consoleErrorSpy.lastCall.args[0]).to.equal(`GET ${uris.products}/products/error failed with: A non-HTTP error`);
           done();
         }, 500);
       });
@@ -100,7 +98,7 @@ describe('Linked Product Indexer', () => {
         indexer[fn]({id: 'supplier_product2', supplier_id: 's1', product_id: '500'});
 
         setTimeout(() => {
-          expect(consoleErrorSpy.lastCall.args[0]).to.equal(`GET ${productApi}/products/500 failed with: HTTP error 500 - {"message":"Internal Server Error"}`);
+          expect(consoleErrorSpy.lastCall.args[0]).to.equal(`GET ${uris.products}/products/500 failed with: HTTP error 500 - {"message":"Internal Server Error"}`);
           done();
         }, 500);
       });
@@ -109,7 +107,7 @@ describe('Linked Product Indexer', () => {
         indexer[fn]({id: 'error', supplier_id: 's1', product_id: 'p1'});
 
         setTimeout(() => {
-          expect(consoleErrorSpy.lastCall.args[0]).to.equal(`PUT ${searchApi}/indexes/orderable-products/error failed with: A non-HTTP error`);
+          expect(consoleErrorSpy.lastCall.args[0]).to.equal(`PUT ${uris.search}/indexes/orderable-products/error failed with: A non-HTTP error`);
           done();
         }, 500);
       });
@@ -118,7 +116,7 @@ describe('Linked Product Indexer', () => {
         indexer[fn]({id: '500', supplier_id: 's1', product_id: 'p1'});
 
         setTimeout(() => {
-          expect(consoleErrorSpy.lastCall.args[0]).to.equal(`PUT ${searchApi}/indexes/orderable-products/500 failed with: HTTP error 500 - {"message":"Internal Server Error"}`);
+          expect(consoleErrorSpy.lastCall.args[0]).to.equal(`PUT ${uris.search}/indexes/orderable-products/500 failed with: HTTP error 500 - {"message":"Internal Server Error"}`);
           done();
         }, 500);
       });
@@ -139,7 +137,7 @@ describe('Linked Product Indexer', () => {
       indexer.remove('error');
 
       setTimeout(() => {
-        expect(consoleErrorSpy.lastCall.args[0]).to.equal(`DELETE ${searchApi}/indexes/orderable-products/error failed with: A non-HTTP error`);
+        expect(consoleErrorSpy.lastCall.args[0]).to.equal(`DELETE ${uris.search}/indexes/orderable-products/error failed with: A non-HTTP error`);
         done();
       }, 500);
     });
@@ -148,7 +146,7 @@ describe('Linked Product Indexer', () => {
       indexer.remove('500');
 
       setTimeout(() => {
-        expect(consoleErrorSpy.lastCall.args[0]).to.equal(`DELETE ${searchApi}/indexes/orderable-products/500 failed with: HTTP error 500 - {"message":"Internal Server Error"}`);
+        expect(consoleErrorSpy.lastCall.args[0]).to.equal(`DELETE ${uris.search}/indexes/orderable-products/500 failed with: HTTP error 500 - {"message":"Internal Server Error"}`);
         done();
       }, 500);
     });
