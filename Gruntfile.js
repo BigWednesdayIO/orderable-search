@@ -20,7 +20,9 @@ module.exports = function (grunt) {
         PRODUCTS_API_SVC_SERVICE_HOST: 'localhost',
         PRODUCTS_API_SVC_SERVICE_PORT: 9001,
         SUPPLIERS_API_SVC_SERVICE_HOST: 'localhost',
-        SUPPLIERS_API_SVC_SERVICE_PORT: 9002
+        SUPPLIERS_API_SVC_SERVICE_PORT: 9002,
+        BIGWEDNESDAY_API_TOKEN: '4383008727',
+        SEARCH_API_TOKEN: '2761266339'
       }
     },
     mochaTest: {

@@ -26,7 +26,7 @@ describe('Product indexer', () => {
     let consoleErrorSpy;
 
     beforeEach(done => {
-      nock(uris.suppliers)
+      nock(uris.suppliers, {reqheaders: {authorization: `Bearer ${process.env.BIGWEDNESDAY_JWT}`, host: () => true}})
         .get('/suppliers?supplies_product=p1')
         .reply(200, supplierLinkedProducts)
         .get('/suppliers?supplies_product=supplier_api_error')
@@ -42,7 +42,7 @@ describe('Product indexer', () => {
         .get('/suppliers?supplies_product=search_api_batch_500')
         .reply(200, [{id: 's1', _metadata: {linked_product_id: 'search_api_batch_500'}}]);
 
-      nock(uris.search)
+      nock(uris.search, {reqheaders: {authorization: `Bearer ${process.env.SEARCH_API_TOKEN}`, host: () => true}})
         .get('/indexes/orderable-products?id[]=s1p&id[]=s2p')
         .reply(200, existingIndexedProducts)
         .get('/indexes/orderable-products?id[]=search_api_get_error')
@@ -54,7 +54,7 @@ describe('Product indexer', () => {
         .get('/indexes/orderable-products?id[]=search_api_batch_500')
         .reply(200, [{objectID: 'search_api_batch_500'}]);
 
-      putToSearchApi = nock(uris.search)
+      putToSearchApi = nock(uris.search, {reqheaders: {authorization: `Bearer ${process.env.SEARCH_API_TOKEN}`, host: () => true}})
         .post('/indexes/orderable-products/batch')
         .reply(200, (uri, body) => indexBatch = JSON.parse(body));
 

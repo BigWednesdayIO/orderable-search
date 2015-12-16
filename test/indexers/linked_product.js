@@ -15,15 +15,15 @@ describe('Linked Product Indexer', () => {
   const product = {name: 'a product', category: 'abc', brand: 'own brand'};
 
   beforeEach(() => {
-    putToSearchApi = nock(uris.search)
+    putToSearchApi = nock(uris.search, {reqheaders: {authorization: `Bearer ${process.env.SEARCH_API_TOKEN}`}})
       .put('/indexes/orderable-products/supplier_product1')
       .reply(200, (uri, body) => putBody = JSON.parse(body));
 
-    deleteFromSearchAPI = nock(uris.search)
+    deleteFromSearchAPI = nock(uris.search, {reqheaders: {authorization: `Bearer ${process.env.SEARCH_API_TOKEN}`}})
       .delete('/indexes/orderable-products/supplier_product1')
       .reply(204, null);
 
-    nock(uris.search)
+    nock(uris.search, {reqheaders: {authorization: `Bearer ${process.env.SEARCH_API_TOKEN}`}})
       .put('/indexes/orderable-products/supplier_product2')
       .reply(200, {})
       .put('/indexes/orderable-products/error')
@@ -35,7 +35,7 @@ describe('Linked Product Indexer', () => {
       .delete('/indexes/orderable-products/500')
       .reply(500, {message: 'Internal Server Error'});
 
-    nock(uris.products)
+    nock(uris.products, {reqheaders: {authorization: `Bearer ${process.env.BIGWEDNESDAY_JWT}`}})
       .get('/products/p1')
       .reply(200, product)
       .persist()
