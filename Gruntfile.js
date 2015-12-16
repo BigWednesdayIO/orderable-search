@@ -13,7 +13,6 @@ module.exports = function (grunt) {
     },
     env: {
       test: {
-        INDEXER_PORT: 8888,
         RESPONSE_FAIL_ACTION: 'error',
         SEARCH_API_SVC_SERVICE_HOST: 'localhost',
         SEARCH_API_SVC_SERVICE_PORT: 9000,
