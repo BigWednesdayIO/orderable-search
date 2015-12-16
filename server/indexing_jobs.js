@@ -7,6 +7,9 @@ module.exports.register = (server, options, next) => {
     method: 'POST',
     path: '/indexing_jobs',
     handler: (request, reply) => {
+      const indexer = require(`../lib/indexers/${request.payload.trigger_type}.js`);
+      indexer[request.payload.action](request.payload.data);
+
       reply().code(202);
     },
     config: {

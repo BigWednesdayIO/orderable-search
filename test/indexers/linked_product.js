@@ -4,8 +4,8 @@ const expect = require('chai').expect;
 const nock = require('nock');
 const sinon = require('sinon');
 
-const indexer = require('../lib/linked_product_indexer');
-const uris = require('../lib/uris');
+const indexer = require('../../lib/indexers/linked_product');
+const uris = require('../../lib/uris');
 
 describe('Linked Product Indexer', () => {
   let putToSearchApi;

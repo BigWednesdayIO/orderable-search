@@ -4,8 +4,8 @@ const expect = require('chai').expect;
 const nock = require('nock');
 const sinon = require('sinon');
 
-const indexer = require('../lib/product_indexer');
-const uris = require('../lib/uris');
+const indexer = require('../../lib/indexers/product');
+const uris = require('../../lib/uris');
 
 const supplierLinkedProducts = [
   {id: 's1', _metadata: {linked_product_id: 's1p'}},
