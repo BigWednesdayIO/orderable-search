@@ -1,0 +1,3 @@
+[submodule "gcloud_scripts"]
+	path = gcloud_scripts
+	url = git@github.com:BigWednesdayIO/kubernetes-deployment-scripts.git
