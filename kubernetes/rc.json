@@ -25,8 +25,8 @@
             "image": "{{QUALIFIED_IMAGE_NAME}}",
             "env": [
               {
-                "name": "BIGWEDNESDAY_API_TOKEN",
-                "value": "{{BIGWEDNESDAY_API_TOKEN}}"
+                "name": "BIGWEDNESDAY_JWT",
+                "value": "{{BIGWEDNESDAY_JWT}}"
               },
               {
                 "name": "SEARCH_API_TOKEN",
