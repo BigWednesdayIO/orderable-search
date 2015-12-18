@@ -1,0 +1,46 @@
+{
+  "apiVersion": "v1",
+  "kind": "ReplicationController",
+  "metadata": {
+    "name": "orderable-search-api-rc-{{VERSION}}",
+    "labels": {
+      "app": "orderable-search-api",
+      "env": "{{NAMESPACE}}"
+    }
+  },
+  "spec": {
+    "replicas": {{REPLICAS}},
+    "template": {
+      "metadata": {
+        "labels": {
+          "app": "orderable-search-api",
+          "env": "{{NAMESPACE}}",
+          "deployment": "{{DEPLOYMENT_ID}}"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "api",
+            "image": "{{QUALIFIED_IMAGE_NAME}}",
+            "env": [
+              {
+                "name": "BIGWEDNESDAY_API_TOKEN",
+                "value": "{{BIGWEDNESDAY_API_TOKEN}}"
+              },
+              {
+                "name": "SEARCH_API_TOKEN",
+                "value": "{{SEARCH_API_TOKEN}}"
+              }
+            ],
+            "ports": [
+              {
+                "containerPort": 8080
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

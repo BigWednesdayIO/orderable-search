@@ -1,11 +1,19 @@
 machine:
   services:
     - docker
+  python:
+    version: 2.7.3
+
+checkout:
+  post:
+    - git submodule update --init
 
 dependencies:
   cache_directories:
     - ~/docker
+    - ~/google-cloud-sdk
   override:
+    - gcloud_scripts/install_sdk.sh
     - if [[ -e ~/docker/node.tar ]]; then docker load -i ~/docker/node.tar; fi
     - docker pull node:5.2.0
     - mkdir -p ~/docker
@@ -15,3 +23,15 @@ dependencies:
 test:
   override:
     - docker run orderablesearch npm run ci
+
+deployment:
+  dev:
+    branch: master
+    commands:
+      - echo "production = true" > .npmrc
+      - gcloud_scripts/kubernetes_deploy.sh orderable-search-api app=orderable-search-api development ${PWD} ${PWD}/kubernetes/rc.json ${PWD}/kubernetes/service.json
+  prod:
+    tag: /v.*/
+    commands:
+      - echo "production = true" > .npmrc
+      - gcloud_scripts/kubernetes_deploy.sh orderable-search-api app=orderable-search-api production ${PWD} ${PWD}/kubernetes/rc.json ${PWD}/kubernetes/service.json
