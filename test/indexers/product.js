@@ -1,5 +1,6 @@
 'use strict';
 
+const _ = require('lodash');
 const expect = require('chai').expect;
 const nock = require('nock');
 const sinon = require('sinon');
@@ -17,7 +18,12 @@ const existingIndexedProducts = [
   {objectID: 's2p', product_id: 'p1', supplier_id: 's2', price: 8.10, was_price: 12.65}
 ];
 
-const updatedProduct = {id: 'p1', name: 'new product name', category: 'abc', brand: 'mars'};
+const updatedProduct = {
+  id: 'p1',
+  name: 'new product name',
+  category: {id: 'c1', name: 'category', _metadata: {hierarchy: ['c', 'c.c1']}},
+  brand: 'mars'
+};
 
 describe('Product indexer', () => {
   describe('update', () => {
@@ -90,14 +96,39 @@ describe('Product indexer', () => {
       expect(indexBatch.requests.map(r => r.body.was_price)).to.deep.equal([21.99, 12.65]);
     });
 
-    it('sends the updated product attributes in the index requests', () => {
-      indexBatch.requests.forEach(request => {
-        for (const property in updatedProduct) {
-          if (updatedProduct.hasOwnProperty(property)) {
-            expect(request.body).to.have.property(property, updatedProduct[property]);
-          }
-        }
-      });
+    _.forOwn(updatedProduct, (value, key) => {
+      if (key === 'category') {
+        it('sends the category id in the index requests', () => {
+          indexBatch.requests.forEach(request => {
+            expect(request.body).to.have.property('category_id', 'c1');
+          });
+        });
+
+        it('sends the category name in the index requests', () => {
+          indexBatch.requests.forEach(request => {
+            expect(request.body).to.have.property('category_name', 'category');
+          });
+        });
+
+        it('sends the category hierarchy in the index requests', () => {
+          indexBatch.requests.forEach(request => {
+            expect(request.body).to.have.property('category_hierarchy');
+            expect(request.body.category_hierarchy).to.deep.equal(['c', 'c.c1']);
+          });
+        });
+
+        it('omits the category attribute in the index requests', () => {
+          indexBatch.requests.forEach(request => {
+            expect(request.body).to.not.have.property('category');
+          });
+        });
+      } else {
+        it(`sends the ${key} attribute in the index requests`, () => {
+          indexBatch.requests.forEach(request => {
+            expect(request.body).to.have.property(key, value);
+          });
+        });
+      }
     });
 
     it('sends suppliers api errors to console.error', done => {
