@@ -1528,7 +1528,8 @@
       "dependencies": {
         "esprima": {
           "version": "2.7.1",
-          "from": "esprima@>=2.6.0 <3.0.0"
+          "from": "esprima@2.7.1",
+          "resolved": "https://registry.npmjs.org/esprima/-/esprima-2.7.1.tgz"
         }
       }
     },
@@ -1641,7 +1642,7 @@
     },
     "lodash": {
       "version": "3.10.1",
-      "from": "lodash@>=3.10.1 <4.0.0",
+      "from": "lodash@*",
       "resolved": "https://registry.npmjs.org/lodash/-/lodash-3.10.1.tgz"
     },
     "lodash-compat": {
@@ -2000,7 +2001,8 @@
     },
     "moment": {
       "version": "2.10.6",
-      "from": "moment@>=2.0.0 <3.0.0"
+      "from": "moment@2.10.6",
+      "resolved": "https://registry.npmjs.org/moment/-/moment-2.10.6.tgz"
     },
     "ms": {
       "version": "0.7.1",
@@ -2425,6 +2427,16 @@
       "from": "resolve@>=1.1.6 <2.0.0",
       "resolved": "https://registry.npmjs.org/resolve/-/resolve-1.1.6.tgz"
     },
+    "resolve-from": {
+      "version": "2.0.0",
+      "from": "resolve-from@>=2.0.0 <3.0.0",
+      "resolved": "https://registry.npmjs.org/resolve-from/-/resolve-from-2.0.0.tgz"
+    },
+    "resolve-pkg": {
+      "version": "0.1.0",
+      "from": "resolve-pkg@>=0.1.0 <0.2.0",
+      "resolved": "https://registry.npmjs.org/resolve-pkg/-/resolve-pkg-0.1.0.tgz"
+    },
     "restore-cursor": {
       "version": "1.0.1",
       "from": "restore-cursor@>=1.0.1 <2.0.0",
@@ -2780,7 +2792,8 @@
     },
     "topo": {
       "version": "2.0.0",
-      "from": "topo@>=2.0.0 <3.0.0"
+      "from": "topo@2.0.0",
+      "resolved": "https://registry.npmjs.org/topo/-/topo-2.0.0.tgz"
     },
     "tough-cookie": {
       "version": "2.2.1",
