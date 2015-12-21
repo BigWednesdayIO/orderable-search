@@ -1,5 +1,6 @@
 'use strict';
 
+const _ = require('lodash');
 const expect = require('chai').expect;
 const nock = require('nock');
 const sinon = require('sinon');
@@ -12,7 +13,11 @@ describe('Linked Product Indexer', () => {
   let deleteFromSearchAPI;
   let putBody;
   let consoleErrorSpy;
-  const product = {name: 'a product', category: 'abc', brand: 'own brand'};
+  const product = {
+    name: 'a product',
+    category: {id: 'c1', name: 'category', _metadata: {hierarchy: ['c', 'c.c1']}},
+    brand: 'own brand'
+  };
 
   beforeEach(() => {
     putToSearchApi = nock(uris.search, {reqheaders: {authorization: `Bearer ${process.env.SEARCH_API_TOKEN}`}})
@@ -36,12 +41,12 @@ describe('Linked Product Indexer', () => {
       .reply(500, {message: 'Internal Server Error'});
 
     nock(uris.products, {reqheaders: {authorization: `Bearer ${process.env.BIGWEDNESDAY_JWT}`}})
-      .get('/products/p1')
+      .get('/products/p1?expand[]=category')
       .reply(200, product)
       .persist()
-      .get('/products/error')
+      .get('/products/error?expand[]=category')
       .replyWithError('A non-HTTP error')
-      .get('/products/500')
+      .get('/products/500?expand[]=category')
       .reply(500, {message: 'Internal Server Error'});
 
     consoleErrorSpy = sinon.spy(console, 'error');
@@ -77,11 +82,28 @@ describe('Linked Product Indexer', () => {
         expect(putBody).to.have.property('was_price', 20.99);
       });
 
-      it('sends the product attributes in the index request', () => {
-        for (const property in product) {
-          if (product.hasOwnProperty(property)) {
-            expect(putBody).to.have.property(property, product[property]);
-          }
+      _.forOwn(product, (value, key) => {
+        if (key === 'category') {
+          it('sends the category id in the index requests', () => {
+            expect(putBody).to.have.property('category_id', 'c1');
+          });
+
+          it('sends the category name in the index requests', () => {
+            expect(putBody).to.have.property('category_name', 'category');
+          });
+
+          it('sends the category hierarchy in the index requests', () => {
+            expect(putBody).to.have.property('category_hierarchy');
+            expect(putBody.category_hierarchy).to.deep.equal(['c', 'c.c1']);
+          });
+
+          it('omits the category attribute in the index requests', () => {
+            expect(putBody).to.not.have.property('category');
+          });
+        } else {
+          it(`sends the ${key} attribute in the index requests`, () => {
+            expect(putBody).to.have.property(key, value);
+          });
         }
       });
 
@@ -89,7 +111,7 @@ describe('Linked Product Indexer', () => {
         indexer[fn]({id: 'supplier_product2', supplier_id: 's1', product_id: 'error'});
 
         setTimeout(() => {
-          expect(consoleErrorSpy.lastCall.args[0]).to.equal(`GET ${uris.products}/products/error failed with: A non-HTTP error`);
+          expect(consoleErrorSpy.lastCall.args[0]).to.equal(`GET ${uris.products}/products/error?expand[]=category failed with: A non-HTTP error`);
           done();
         }, 500);
       });
@@ -98,7 +120,7 @@ describe('Linked Product Indexer', () => {
         indexer[fn]({id: 'supplier_product2', supplier_id: 's1', product_id: '500'});
 
         setTimeout(() => {
-          expect(consoleErrorSpy.lastCall.args[0]).to.equal(`GET ${uris.products}/products/500 failed with: HTTP error 500 - {"message":"Internal Server Error"}`);
+          expect(consoleErrorSpy.lastCall.args[0]).to.equal(`GET ${uris.products}/products/500?expand[]=category failed with: HTTP error 500 - {"message":"Internal Server Error"}`);
           done();
         }, 500);
       });
