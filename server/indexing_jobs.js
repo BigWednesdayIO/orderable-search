@@ -20,7 +20,7 @@ module.exports.register = (server, options, next) => {
           action: Joi.string().required().when('trigger_type', {is: 'product', then: Joi.valid('update'), otherwise: Joi.valid('add', 'remove', 'update')}).description('Type of action that triggered the job'),
           data: Joi.object({
             id: Joi.string().required().description('The identifier of the triggering resource')
-          }).required().meta({className: 'IndexingJobData'}).description('Data associated with the action')
+          }).required().unknown().meta({className: 'IndexingJobData'}).description('Data associated with the action')
         }).meta({className: 'IndexingJob'}).description('An indexing job')
       }
     }

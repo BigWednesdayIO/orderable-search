@@ -6,19 +6,19 @@ const specRequest = require('./spec_request');
 describe('/indexing_jobs', () => {
   describe('post', () => {
     it('returns http 202 for update product request', () =>
-      specRequest({url: '/indexing_jobs', method: 'POST', payload: {trigger_type: 'product', action: 'update', data: {id: '1'}}})
+      specRequest({url: '/indexing_jobs', method: 'POST', payload: {trigger_type: 'product', action: 'update', data: {id: '1', name: 'a product'}}})
         .then(response => expect(response.statusCode).to.equal(202)));
 
     it('returns http 202 for add linked product request', () =>
-      specRequest({url: '/indexing_jobs', method: 'POST', payload: {trigger_type: 'linked_product', action: 'add', data: {id: '1'}}})
+      specRequest({url: '/indexing_jobs', method: 'POST', payload: {trigger_type: 'linked_product', action: 'add', data: {id: '1', name: 'a product'}}})
         .then(response => expect(response.statusCode).to.equal(202)));
 
     it('returns http 202 for update linked product request', () =>
-      specRequest({url: '/indexing_jobs', method: 'POST', payload: {trigger_type: 'linked_product', action: 'update', data: {id: '1'}}})
+      specRequest({url: '/indexing_jobs', method: 'POST', payload: {trigger_type: 'linked_product', action: 'update', data: {id: '1', name: 'a product'}}})
         .then(response => expect(response.statusCode).to.equal(202)));
 
     it('returns http 202 for remove linked product request', () =>
-      specRequest({url: '/indexing_jobs', method: 'POST', payload: {trigger_type: 'linked_product', action: 'remove', data: {id: '1'}}})
+      specRequest({url: '/indexing_jobs', method: 'POST', payload: {trigger_type: 'linked_product', action: 'remove', data: {id: '1', name: 'a product'}}})
         .then(response => expect(response.statusCode).to.equal(202)));
 
     describe('validation payload', () => {
