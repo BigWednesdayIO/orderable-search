@@ -134,7 +134,7 @@ describe('Linked Product Indexer', () => {
         }, 500);
       });
 
-      it('sends search api non-200 responses to console.error', done => {
+      it('sends search api non-2xx responses to console.error', done => {
         indexer[fn]({id: '500', supplier_id: 's1', product_id: 'p1'});
 
         setTimeout(() => {
