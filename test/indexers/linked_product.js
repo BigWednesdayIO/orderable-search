@@ -13,10 +13,22 @@ describe('Linked Product Indexer', () => {
   let deleteFromSearchAPI;
   let putBody;
   let consoleErrorSpy;
+  const createdDate = new Date();
+
   const product = {
     name: 'a product',
     category: {id: 'c1', name: 'category', _metadata: {hierarchy: ['c', 'c.c1']}},
-    brand: 'own brand'
+    brand: 'own brand',
+    product_type_attributes: [{
+      name: 'attribute1',
+      values: ['one', 'two']
+    }, {
+      name: 'attribute2',
+      values: [1, 2]
+    }],
+    _metadata: {
+      created: createdDate
+    }
   };
 
   beforeEach(() => {
@@ -100,6 +112,26 @@ describe('Linked Product Indexer', () => {
           it('omits the category attribute in the index requests', () => {
             expect(putBody).to.not.have.property('category');
           });
+        } else if (key === 'product_type_attributes') {
+          it('maps product_type_attributes to properties in the index requests', () => {
+            product.product_type_attributes.forEach(attribute => {
+              expect(putBody).to.have.property(attribute.name);
+              expect(putBody[attribute.name]).to.deep.equal(attribute.values);
+            });
+          });
+
+          it('omits the product_type_attributes attribute in the index requests', () => {
+            expect(putBody).to.not.have.property('product_type_attributes');
+          });
+        } else if (key === '_metadata') {
+          it('sends the created attribute in the index requests', () => {
+            expect(putBody).to.have.property('created');
+            expect(putBody.created).to.deep.equal(createdDate.toISOString());
+          });
+
+          it('omits the _metadata attribute', () => {
+            expect(putBody).to.not.have.property('_metadata');
+          });
         } else {
           it(`sends the ${key} attribute in the index requests`, () => {
             expect(putBody).to.have.property(key, value);
@@ -134,7 +166,7 @@ describe('Linked Product Indexer', () => {
         }, 500);
       });
 
-      it('sends search api non-200 responses to console.error', done => {
+      it('sends search api non-2xx responses to console.error', done => {
         indexer[fn]({id: '500', supplier_id: 's1', product_id: 'p1'});
 
         setTimeout(() => {
@@ -147,7 +179,7 @@ describe('Linked Product Indexer', () => {
 
   describe('remove', () => {
     it('removes the supplier\'s product from the index', done => {
-      indexer.remove('supplier_product1');
+      indexer.remove({id: 'supplier_product1'});
 
       setTimeout(() => {
         expect(deleteFromSearchAPI.isDone()).to.equal(true, 'Failed to make DELETE request to Search API');
@@ -156,7 +188,7 @@ describe('Linked Product Indexer', () => {
     });
 
     it('sends search api errors to console.error', done => {
-      indexer.remove('error');
+      indexer.remove({id: 'error'});
 
       setTimeout(() => {
         expect(consoleErrorSpy.lastCall.args[0]).to.equal(`DELETE ${uris.search}/indexes/orderable-products/error failed with: A non-HTTP error`);
@@ -165,7 +197,7 @@ describe('Linked Product Indexer', () => {
     });
 
     it('sends search api non-200 responses to console.error', done => {
-      indexer.remove('500');
+      indexer.remove({id: '500'});
 
       setTimeout(() => {
         expect(consoleErrorSpy.lastCall.args[0]).to.equal(`DELETE ${uris.search}/indexes/orderable-products/500 failed with: HTTP error 500 - {"message":"Internal Server Error"}`);
