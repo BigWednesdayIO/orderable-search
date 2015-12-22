@@ -18,6 +18,8 @@ const existingIndexedProducts = [
   {objectID: 's2p', product_id: 'p1', supplier_id: 's2', price: 8.10, was_price: 12.65}
 ];
 
+const createdDate = new Date();
+
 const updatedProduct = {
   id: 'p1',
   name: 'new product name',
@@ -29,7 +31,10 @@ const updatedProduct = {
   }, {
     name: 'attribute2',
     values: [1, 2]
-  }]
+  }],
+  _metadata: {
+    created: createdDate
+  }
 };
 
 describe('Product indexer', () => {
@@ -142,6 +147,19 @@ describe('Product indexer', () => {
         it('omits the product_type_attributes attribute in the index requests', () => {
           indexBatch.requests.forEach(request => {
             expect(request.body).to.not.have.property('product_type_attributes');
+          });
+        });
+      } else if (key === '_metadata') {
+        it('sends the created attribute in the index requests', () => {
+          indexBatch.requests.forEach(request => {
+            expect(request.body).to.have.property('created');
+            expect(request.body.created).to.equal(createdDate.toISOString());
+          });
+        });
+
+        it('omits the _metadata attribute', () => {
+          indexBatch.requests.forEach(request => {
+            expect(request.body).to.not.have.property('_metadata');
           });
         });
       } else {

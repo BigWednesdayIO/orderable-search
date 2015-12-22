@@ -13,6 +13,7 @@ describe('Linked Product Indexer', () => {
   let deleteFromSearchAPI;
   let putBody;
   let consoleErrorSpy;
+  const createdDate = new Date();
 
   const product = {
     name: 'a product',
@@ -24,7 +25,10 @@ describe('Linked Product Indexer', () => {
     }, {
       name: 'attribute2',
       values: [1, 2]
-    }]
+    }],
+    _metadata: {
+      created: createdDate
+    }
   };
 
   beforeEach(() => {
@@ -118,6 +122,15 @@ describe('Linked Product Indexer', () => {
 
           it('omits the product_type_attributes attribute in the index requests', () => {
             expect(putBody).to.not.have.property('product_type_attributes');
+          });
+        } else if (key === '_metadata') {
+          it('sends the created attribute in the index requests', () => {
+            expect(putBody).to.have.property('created');
+            expect(putBody.created).to.deep.equal(createdDate.toISOString());
+          });
+
+          it('omits the _metadata attribute', () => {
+            expect(putBody).to.not.have.property('_metadata');
           });
         } else {
           it(`sends the ${key} attribute in the index requests`, () => {
