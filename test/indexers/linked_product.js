@@ -147,7 +147,7 @@ describe('Linked Product Indexer', () => {
 
   describe('remove', () => {
     it('removes the supplier\'s product from the index', done => {
-      indexer.remove('supplier_product1');
+      indexer.remove({id: 'supplier_product1'});
 
       setTimeout(() => {
         expect(deleteFromSearchAPI.isDone()).to.equal(true, 'Failed to make DELETE request to Search API');
@@ -156,7 +156,7 @@ describe('Linked Product Indexer', () => {
     });
 
     it('sends search api errors to console.error', done => {
-      indexer.remove('error');
+      indexer.remove({id: 'error'});
 
       setTimeout(() => {
         expect(consoleErrorSpy.lastCall.args[0]).to.equal(`DELETE ${uris.search}/indexes/orderable-products/error failed with: A non-HTTP error`);
@@ -165,7 +165,7 @@ describe('Linked Product Indexer', () => {
     });
 
     it('sends search api non-200 responses to console.error', done => {
-      indexer.remove('500');
+      indexer.remove({id: '500'});
 
       setTimeout(() => {
         expect(consoleErrorSpy.lastCall.args[0]).to.equal(`DELETE ${uris.search}/indexes/orderable-products/500 failed with: HTTP error 500 - {"message":"Internal Server Error"}`);
