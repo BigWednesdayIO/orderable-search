@@ -130,8 +130,8 @@ describe('Product indexer', () => {
           });
         });
       } else if (key === 'product_type_attributes') {
-        updatedProduct.product_type_attributes.forEach(attribute => {
-          it(`sends the ${attribute.name} attribute in the index requests`, () => {
+        it('maps product_type_attributes to properties in the index requests', () => {
+          updatedProduct.product_type_attributes.forEach(attribute => {
             indexBatch.requests.forEach(request => {
               expect(request.body).to.have.property(attribute.name);
               expect(request.body[attribute.name]).to.deep.equal(attribute.values);

@@ -109,8 +109,8 @@ describe('Linked Product Indexer', () => {
             expect(putBody).to.not.have.property('category');
           });
         } else if (key === 'product_type_attributes') {
-          product.product_type_attributes.forEach(attribute => {
-            it(`sends the ${attribute.name} attribute in the index requests`, () => {
+          it('maps product_type_attributes to properties in the index requests', () => {
+            product.product_type_attributes.forEach(attribute => {
               expect(putBody).to.have.property(attribute.name);
               expect(putBody[attribute.name]).to.deep.equal(attribute.values);
             });
