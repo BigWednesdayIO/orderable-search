@@ -110,9 +110,9 @@ describe('Product indexer', () => {
 
     _.forOwn(updatedProduct, (value, key) => {
       if (key === 'category') {
-        it('sends the category id in the index requests', () => {
+        it('sends the category path in the index requests', () => {
           indexBatch.requests.forEach(request => {
-            expect(request.body).to.have.property('category_id', 'c1');
+            expect(request.body).to.have.property('category_path', 'c.c1');
           });
         });
 
