@@ -13,10 +13,18 @@ describe('Linked Product Indexer', () => {
   let deleteFromSearchAPI;
   let putBody;
   let consoleErrorSpy;
+
   const product = {
     name: 'a product',
     category: {id: 'c1', name: 'category', _metadata: {hierarchy: ['c', 'c.c1']}},
-    brand: 'own brand'
+    brand: 'own brand',
+    product_type_attributes: [{
+      name: 'attribute1',
+      values: ['one', 'two']
+    }, {
+      name: 'attribute2',
+      values: [1, 2]
+    }]
   };
 
   beforeEach(() => {
@@ -99,6 +107,17 @@ describe('Linked Product Indexer', () => {
 
           it('omits the category attribute in the index requests', () => {
             expect(putBody).to.not.have.property('category');
+          });
+        } else if (key === 'product_type_attributes') {
+          product.product_type_attributes.forEach(attribute => {
+            it(`sends the ${attribute.name} attribute in the index requests`, () => {
+              expect(putBody).to.have.property(attribute.name);
+              expect(putBody[attribute.name]).to.deep.equal(attribute.values);
+            });
+          });
+
+          it('omits the product_type_attributes attribute in the index requests', () => {
+            expect(putBody).to.not.have.property('product_type_attributes');
           });
         } else {
           it(`sends the ${key} attribute in the index requests`, () => {

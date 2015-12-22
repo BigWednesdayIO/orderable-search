@@ -22,7 +22,14 @@ const updatedProduct = {
   id: 'p1',
   name: 'new product name',
   category: {id: 'c1', name: 'category', _metadata: {hierarchy: ['c', 'c.c1']}},
-  brand: 'mars'
+  brand: 'mars',
+  product_type_attributes: [{
+    name: 'attribute1',
+    values: ['one', 'two']
+  }, {
+    name: 'attribute2',
+    values: [1, 2]
+  }]
 };
 
 describe('Product indexer', () => {
@@ -120,6 +127,21 @@ describe('Product indexer', () => {
         it('omits the category attribute in the index requests', () => {
           indexBatch.requests.forEach(request => {
             expect(request.body).to.not.have.property('category');
+          });
+        });
+      } else if (key === 'product_type_attributes') {
+        updatedProduct.product_type_attributes.forEach(attribute => {
+          it(`sends the ${attribute.name} attribute in the index requests`, () => {
+            indexBatch.requests.forEach(request => {
+              expect(request.body).to.have.property(attribute.name);
+              expect(request.body[attribute.name]).to.deep.equal(attribute.values);
+            });
+          });
+        });
+
+        it('omits the product_type_attributes attribute in the index requests', () => {
+          indexBatch.requests.forEach(request => {
+            expect(request.body).to.not.have.property('product_type_attributes');
           });
         });
       } else {
