@@ -96,8 +96,8 @@ describe('Linked Product Indexer', () => {
 
       _.forOwn(product, (value, key) => {
         if (key === 'category') {
-          it('sends the category id in the index requests', () => {
-            expect(putBody).to.have.property('category_id', 'c1');
+          it('sends the category path in the index requests', () => {
+            expect(putBody).to.have.property('category_path', 'c.c1');
           });
 
           it('sends the category name in the index requests', () => {
