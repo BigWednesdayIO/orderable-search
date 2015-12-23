@@ -13,7 +13,7 @@ module.exports.register = (server, options, next) => {
       request({
         uri: `${uris.search}/indexes/orderable-products/query`,
         method: 'POST',
-        body: req.payload,
+        body: req.payload.length > 0 ? req.payload : null,
         headers: {authorization: 'Bearer NG0TuV~u2ni#BP|'}
       }, (err, response, body) => {
         if (err) {
