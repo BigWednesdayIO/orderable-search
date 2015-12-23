@@ -16,6 +16,8 @@ const plugins = [{
   }
 }, {
   register: require('./indexing_jobs')
+}, {
+  register: require('./search')
 }];
 
 module.exports = callback => {
