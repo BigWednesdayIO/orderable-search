@@ -7,7 +7,7 @@ module.exports.register = (server, options, next) => {
     method: 'POST',
     path: '/search',
     handler(req, reply) {
-      searchProxy(req.auth, req.payload.length ? req.payload : null)
+      searchProxy(req.auth.credentials.customer_id, req.payload.length ? req.payload : null)
         .then(reply, err => {
           console.error('Proxying error', err);
           reply(err);
@@ -16,6 +16,9 @@ module.exports.register = (server, options, next) => {
     config: {
       payload: {
         parse: false
+      },
+      auth: {
+        strategy: 'jwt'
       }
     }
   });

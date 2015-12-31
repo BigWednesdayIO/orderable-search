@@ -64,7 +64,7 @@ describe('Search proxy', () => {
         {price_adjustment_group_id: 'group2', linked_product_id: 'combinedadjustments', type: 'value_override', amount: 15}
       ]);
 
-    return searchProxy({customerId: 1}, new Buffer('{"query": "test"}'), testDate)
+    return searchProxy(1, new Buffer('{"query": "test"}'), testDate)
       .then(results => proxyResults = results);
   });
 

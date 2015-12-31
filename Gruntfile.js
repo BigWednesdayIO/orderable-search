@@ -22,6 +22,7 @@ module.exports = function (grunt) {
         SUPPLIERS_API_SVC_SERVICE_PORT: 9002,
         CUSTOMERS_API_SVC_SERVICE_HOST: 'localhost',
         CUSTOMERS_API_SVC_SERVICE_PORT: 9003,
+        BIGWEDNESDAY_JWT_SECRET: 'SECRET',
         BIGWEDNESDAY_JWT: '4383008727',
         SEARCH_API_TOKEN: '2761266339'
       }

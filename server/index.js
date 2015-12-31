@@ -15,6 +15,8 @@ const plugins = [{
     }
   }
 }, {
+  register: require('./jwt_auth_strategy')
+}, {
   register: require('./indexing_jobs')
 }, {
   register: require('./search')
