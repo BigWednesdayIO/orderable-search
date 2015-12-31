@@ -26,6 +26,7 @@ describe('Search proxy', () => {
 
   before(() => {
     nock(uris.search, {reqHeaders: {authorization: `Bearer ${process.env.SEARCH_API_TOKEN}`, host: () => true}})
+      .persist()
       .post('/indexes/orderable-products/query')
       .reply(200, (uri, body) => {
         if (JSON.parse(body).query === 'test') {
@@ -64,7 +65,7 @@ describe('Search proxy', () => {
         {price_adjustment_group_id: 'group2', linked_product_id: 'combinedadjustments', type: 'value_override', amount: 15}
       ]);
 
-    return searchProxy(1, new Buffer('{"query": "test"}'), testDate)
+    return searchProxy(new Buffer('{"query": "test"}'), 1, testDate)
       .then(results => proxyResults = results);
   });
 
@@ -96,4 +97,8 @@ describe('Search proxy', () => {
 
   it('applies customer adjustments to group adjustments', () =>
     expect(proxyResults.hits[7]).to.have.property('price', 10));
+
+  it('uses the default search result when there is no identified customer', () =>
+    searchProxy(new Buffer('{"query": "test"}'), undefined, testDate)
+      .then(results => expect(results).to.deep.equal(stubbedSearchResults)));
 });

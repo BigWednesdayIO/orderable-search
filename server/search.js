@@ -7,7 +7,10 @@ module.exports.register = (server, options, next) => {
     method: 'POST',
     path: '/search',
     handler(req, reply) {
-      searchProxy(req.auth.credentials.customer_id, req.payload.length ? req.payload : null)
+      const query = req.payload.length ? req.payload : null;
+      const customerId = req.auth.credentials ? req.auth.credentials.customer_id : null;
+
+      searchProxy(query, customerId, new Date())
         .then(reply, err => {
           console.error('Proxying error', err);
           reply(err);
@@ -18,7 +21,8 @@ module.exports.register = (server, options, next) => {
         parse: false
       },
       auth: {
-        strategy: 'jwt'
+        strategy: 'jwt',
+        mode: 'optional'
       }
     }
   });
