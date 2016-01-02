@@ -27,6 +27,9 @@
               {
                 "name": "BIGWEDNESDAY_JWT",
                 "value": "{{BIGWEDNESDAY_JWT}}"
+              },{
+                "name": "BIGWEDNESDAY_JWT_SECRET",
+                "value": "{{BIGWEDNESDAY_JWT_SECRET}}"
               },
               {
                 "name": "SEARCH_API_TOKEN",
