@@ -39,15 +39,16 @@ describe('Search proxy', () => {
     nock(uris.customers, {reqHeaders: {authorization: process.env.BIGWEDNESDAY_JWT}})
       .get(`/customers/1/product_price_adjustments?date=${testDate.toISOString()}`)
       .reply(200, [
-        {linked_product_id: 'customeroverriden', type: 'value_override', amount: 30.10},
-        {linked_product_id: 'customervalueadjusted', type: 'value_adjustment', amount: -0.50},
-        {linked_product_id: 'customerpercentageadjusted', type: 'percentage_adjustment', amount: 90},
-        {linked_product_id: 'combinedadjustments', type: 'value_adjustment', amount: -5}
+        {linked_product_id: 'customeroverriden', type: 'value_override', amount: 30.10, _metadata: {membership_id: 'ms1'}},
+        {linked_product_id: 'customervalueadjusted', type: 'value_adjustment', amount: -0.50, _metadata: {membership_id: 'ms1'}},
+        {linked_product_id: 'customerpercentageadjusted', type: 'percentage_adjustment', amount: 90, _metadata: {membership_id: 'ms1'}},
+        {linked_product_id: 'combinedadjustments', type: 'value_adjustment', amount: -5, _metadata: {membership_id: 'ms3'}}
       ])
       .get('/customers/1/memberships')
       .reply(200, [
-        {supplier_id: '2', price_adjustment_group_id: 'group1'},
-        {supplier_id: '3', price_adjustment_group_id: 'group2'}
+        {id: 'ms1', supplier_id: '1', price_adjustment_group_id: 'group0'},
+        {id: 'ms2', supplier_id: '2', price_adjustment_group_id: 'group1'},
+        {id: 'ms3', supplier_id: '3', price_adjustment_group_id: 'group2'}
       ]);
 
     nock(uris.suppliers, {reqHeaders: {authorization: process.env.BIGWEDNESDAY_JWT}})
