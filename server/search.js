@@ -1,33 +1,36 @@
 'use strict';
 
-const _ = require('lodash');
-const request = require('request');
+const Joi = require('joi');
 
-const uris = require('../lib/uris');
+const searchProxy = require('../lib/search_proxy');
 
 module.exports.register = (server, options, next) => {
   server.route({
     method: 'POST',
     path: '/search',
     handler(req, reply) {
-      request({
-        uri: `${uris.search}/indexes/orderable-products/query`,
-        method: 'POST',
-        body: req.payload.length > 0 ? req.payload : null,
-        headers: {authorization: 'Bearer NG0TuV~u2ni#BP|'}
-      }, (err, response, body) => {
-        if (err) {
-          console.error('Proxying error', err);
-          return reply(err);
-        }
+      const query = req.payload.length ? req.payload : null;
+      const customerId = req.auth.credentials ? req.auth.credentials.customer_id : null;
+      const date = req.query.date || new Date();
 
-        const res = reply(body).code(response.statusCode);
-        _.forOwn(response.headers, (value, key) => res.header(key, value));
-      });
+      searchProxy(query, customerId, date)
+        .then(reply, err => {
+          console.error('Proxying error', err);
+          reply(err);
+        });
     },
     config: {
       payload: {
         parse: false
+      },
+      validate: {
+        query: {
+          date: Joi.date()
+        }
+      },
+      auth: {
+        strategy: 'jwt',
+        mode: 'optional'
       }
     }
   });

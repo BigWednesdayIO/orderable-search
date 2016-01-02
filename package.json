@@ -24,7 +24,9 @@
   },
   "homepage": "https://github.com/BigWednesdayIO/orderable-search#readme",
   "dependencies": {
+    "decimal": "0.0.2",
     "hapi": "^11.1.2",
+    "hapi-auth-jwt2": "^5.3.0",
     "hapi-error-schemas": "^1.0.0",
     "hapi-swaggered": "^2.4.1",
     "hapi-version-route": "^1.1.0",
