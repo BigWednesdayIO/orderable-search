@@ -55,13 +55,13 @@ describe('Search proxy', () => {
       .get('/suppliers/1/price_adjustments')
       .query(true)
       .reply(200, [])
-      .get(`/suppliers/2/price_adjustments?price_adjustment_group_id=group1&date=${testDate.toISOString()}&product_id[]=groupoverriden&product_id[]=groupvalueadjusted&product_id[]=grouppercentageadjusted`)
+      .get(`/suppliers/2/price_adjustments?price_adjustment_group_id=group1&date=${testDate.toISOString()}&linked_product_id[]=groupoverriden&linked_product_id[]=groupvalueadjusted&linked_product_id[]=grouppercentageadjusted`)
       .reply(200, [
         {price_adjustment_group_id: 'group1', type: 'value_override', amount: 15.00, _metadata: {linked_product_id: 'groupoverriden'}},
         {price_adjustment_group_id: 'group1', type: 'value_adjustment', amount: 1, _metadata: {linked_product_id: 'groupvalueadjusted'}},
         {price_adjustment_group_id: 'group1', type: 'percentage_adjustment', amount: 125, _metadata: {linked_product_id: 'grouppercentageadjusted'}}
       ])
-      .get(`/suppliers/3/price_adjustments?price_adjustment_group_id=group2&date=${testDate.toISOString()}&product_id[]=combinedadjustments`)
+      .get(`/suppliers/3/price_adjustments?price_adjustment_group_id=group2&date=${testDate.toISOString()}&linked_product_id[]=combinedadjustments`)
       .reply(200, [
         {price_adjustment_group_id: 'group2', type: 'value_override', amount: 15, _metadata: {linked_product_id: 'combinedadjustments'}}
       ]);
