@@ -1,6 +1,6 @@
 {
   "name": "orderable-search",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A wrapper around Big Wednesday search for Orderable",
   "main": "index.js",
   "engines": {
